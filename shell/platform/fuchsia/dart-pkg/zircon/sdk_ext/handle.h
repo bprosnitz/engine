@@ -20,7 +20,7 @@ namespace zircon {
 namespace dart {
 /**
  * Handle is the native peer of a Dart object (Handle in dart:zircon)
- * that holds an zx_handle_t. It tracks active waiters on handle too.
+ * that holds a zx_handle_t. It tracks active waiters on handle too.
  */
 class Handle : public fml::RefCountedThreadSafe<Handle>,
                public tonic::DartWrappable {
@@ -88,6 +88,48 @@ class Handle : public fml::RefCountedThreadSafe<Handle>,
   tonic::DartPersistentValue closure_string_;
   tonic::DartPersistentValue on_wait_completer_type_;
   tonic::DartPersistentValue schedule_microtask_string_;
+};
+
+/**
+ * HandleDisposition is the native peer of a Dart object
+ * (HandleDisposition in dart:zircon)
+ * that corresponds to zx_handle_disposition_t.
+ */
+class HandleDisposition : public fml::RefCountedThreadSafe<HandleDisposition>,
+               public tonic::DartWrappable {
+  DEFINE_WRAPPERTYPEINFO();
+  FML_FRIEND_REF_COUNTED_THREAD_SAFE(HandleDisposition);
+  FML_FRIEND_MAKE_REF_COUNTED(HandleDisposition);
+
+  public:
+  zx_handle_op_t operation() const { return operation_; }
+  fml::RefPtr<Handle> handle() const { return handle_; }
+  zx_obj_type_t type() const { return type_; }
+  zx_rights_t rights() const { return rights_; }
+  zx_status_t result() const  { return result_; }
+
+  void set_operation(zx_handle_op_t operation) { operation_ = operation; }
+  void set_handle(fml::RefPtr<Handle> handle) { handle_ = handle; }
+  void set_type(zx_obj_type_t type) { type_ = type; }
+  void set_rights(zx_rights_t rights) { rights_ = rights; }
+  void set_result(zx_status_t result) { result_ = result; }
+
+  zx_handle_disposition_t handle_disposition() {
+    return {
+      .operation = operation_,
+      .handle = handle_->handle(),
+      .type = type_,
+      .rights = rights_,
+      .result = result_,
+    };
+  }
+
+private:
+  zx_handle_op_t operation_;
+  fml::RefPtr<Handle> handle_;
+  zx_obj_type_t type_;
+  zx_rights_t rights_;
+  zx_status_t result_;
 };
 
 }  // namespace dart

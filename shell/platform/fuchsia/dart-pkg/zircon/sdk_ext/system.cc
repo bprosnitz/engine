@@ -240,6 +240,31 @@ zx_status_t System::ChannelWrite(fml::RefPtr<Handle> channel,
   return status;
 }
 
+zx_status_t System::ChannelWriteEtc(fml::RefPtr<Handle> channel,
+                                 const tonic::DartByteData& data,
+                                 std::vector<HandleDisposition*> handle_dispositions) {
+  if (!channel || !channel->is_valid()) {
+    data.Release();
+    return ZX_ERR_BAD_HANDLE;
+  }
+
+  std::vector<zx_handle_disposition_t> zx_handle_dispositions;
+  for (HandleDisposition* handle_disposition : handle_dispositions) {
+    zx_handle_dispositions.push_back(handle_disposition->handle_disposition());
+  }
+
+  zx_status_t status = zx_channel_write_etc(channel->handle(), 0, data.data(),
+                                        data.length_in_bytes(),
+                                        zx_handle_dispositions.data(), zx_handle_dispositions.size());
+  // Handles are always consumed.
+  for (HandleDisposition* handle_disposition : handle_dispositions) {
+    handle_disposition->handle()->ReleaseHandle();
+  }
+
+  data.Release();
+  return status;
+}
+
 Dart_Handle System::ChannelQueryAndRead(fml::RefPtr<Handle> channel) {
   if (!channel || !channel->is_valid()) {
     return ConstructDartObject(kReadResult, ToDart(ZX_ERR_BAD_HANDLE));

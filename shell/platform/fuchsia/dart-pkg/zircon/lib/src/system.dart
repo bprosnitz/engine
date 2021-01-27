@@ -161,6 +161,8 @@ class System extends NativeFieldWrapperClass2 {
     native 'System_ConnectToService';
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles)
       native 'System_ChannelWrite';
+  static int channelWriteEtc(Handle channel, ByteData data, List<HandleDisposition> handles)
+      native 'System_ChannelWriteEtc';
   static ReadResult channelQueryAndRead(Handle channel)
       native 'System_ChannelQueryAndRead';
 
