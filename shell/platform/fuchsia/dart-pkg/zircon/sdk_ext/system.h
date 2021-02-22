@@ -37,6 +37,9 @@ class System : public fml::RefCountedThreadSafe<System>,
   static zx_status_t ChannelWrite(fml::RefPtr<Handle> channel,
                                   const tonic::DartByteData& data,
                                   std::vector<Handle*> handles);
+  static zx_status_t ChannelWriteEtc(fml::RefPtr<Handle> channel,
+                                  const tonic::DartByteData& data,
+                                  std::vector<HandleDisposition*> handles);
   // TODO(ianloic): Add ChannelRead
   static Dart_Handle ChannelQueryAndRead(fml::RefPtr<Handle> channel);
 
